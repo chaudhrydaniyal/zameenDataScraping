@@ -17,9 +17,14 @@ app.use(function (req, res, next) {
   next();
 });
 
+
+process.setMaxListeners(Infinity); // <== Important line
+
+
 app.get("/zameenData", async (req, res) => {
-  const propertyType = "Houses_Property";
-  const city = "Islamabad";
+  const propertyType = "Flats_Apartments";
+  // const propertyType = "Houses_Property";
+  const city = "Lahore";
 
   var number = "0";
 
@@ -35,12 +40,14 @@ app.get("/zameenData", async (req, res) => {
       break;
   }
 
-  for (i = 1; i < 10; i++) {
+  for (i = 20; i < 30; i++) {
     const receivedData = await scrapers.scrapeZameenData(
       `https://www.zameen.com/${propertyType}/${city}-${number}-${i}.html`,
       propertyType,
       city
     );
+
+    // console.log("recd",receivedData.finalZameenData)
 
     // res.send(receivedData);
 
@@ -52,8 +59,8 @@ app.get("/zameenData", async (req, res) => {
       if (err) throw err;
       var dbo = db.db("ZameenData");
       dbo
-        .collection("property")
-        .insertMany(receivedData.zameenData, function (err, res) {
+        .collection("LahoreFlatsData")
+        .insertMany(receivedData.finalZameenData, function (err, res) {
           if (err) throw err;
           console.log("1 document inserted");
           db.close();
